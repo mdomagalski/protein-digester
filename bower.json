@@ -1,0 +1,26 @@
+{
+  "name": "protein-digester",
+  "version": "0.0.0",
+  "description": "Protein digester",
+  "license": "MIT",
+  "main": "protein-digester.html",
+  "keywords": [
+    "polymer",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer#^1.3.1",
+    "fishtones-js": "fishtones#*",
+    "xregexp": "https://github.com/slevithan/xregexp/tarball/master",
+    "paper-input": "PolymerElements/paper-input#^1.1.15",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.4.0",
+    "paper-button": "PolymerElements/paper-button#^1.0.12",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.3.2",
+    "paper-item": "PolymerElements/paper-item#^1.2.1",
+    "paper-listbox": "PolymerElements/paper-listbox#^1.1.2"
+  }
+}
