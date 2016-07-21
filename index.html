@@ -15,18 +15,19 @@
 <body>
 <!-- Runs custom element -->
 
-<protein-digester protein='MESPSAPPHRWCIPWQRLLLTASLLTFWNPPTTAKLTIESTPFNVAEGKEVLLLVHNLPQ
-HLFGYSWYKGERVDGNRQIIGYVIGTQQATPGPAYSGREIIYPNASLLIQNIIQNDTGFY
-TLHVIKSDLVNEEATGQFRVYPELPKPSISSNNSKPVEDKDAVAFTCEPETQDATYLWWV
-NNQSLPVSPRLQLSNGNRTLTLFNVTRNDTASYKCETQNPVSARRSDSVILNVLYGPDAP
-TISPLNTSYRSGENLNLSCHAASNPPAQYSWFVNGTFQQSTQELFIPNITVNNSGSYTCQ
-AHNSDTGLNRTTVTTITVYAEPPKPFITSNNSNPVEDEDAVALTCEPEIQNTTYLWWVNN
-QSLPVSPRLQLSNDNRTLTLLSVTRNDVGPYECGIQNKLSVDHSDPVILNVLYGPDDPTI
-SPSYTYYRPGVNLSLSCHAASNPPAQYSWLIDGNIQQHTQELFISNITEKNSGLYTCQAN
-NSASGHSRTTVKTITVSAELPKPSISSNNSKPVEDKDAVAFTCEPEAQNTTYLWWVNGQS
-LPVSPRLQLSNGNRTLTLFNVTRNDARAYVCGIQNSVSANRSDPVTLDVLYGPDTPIISP
-PDSSYLSGANLNLSCHSASNPSPQYSWRINGIPQQHTQVLFIAKITPNNNGTYACFVSNL
-ATGRNNSIVKSITVSASGTSPGLSAGATVGIMIGVLVGVALI'>
-</protein-digester>
+<protein-digester uniprot-id="P54345" onclick="update()"></protein-digester>
+
+<div id="header"></div>
+<div id="protein"></div>
+<div id="peptides"></div>
+
+<script>
+    update = function(){
+        document.querySelector("#header").innerHTML = '<h2>Protein</h2>'+document.querySelector("protein-digester").fastaHeader;
+        document.querySelector("#protein").innerHTML = document.querySelector("protein-digester").proteinSequence;
+        document.querySelector("#peptides").innerHTML = '<h2>Peptides</h2>'+
+            document.querySelector("protein-digester").peptides.toString().replace(/,/g, '</br>');
+    }
+</script>
 </body>
 </html>

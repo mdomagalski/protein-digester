@@ -19,7 +19,7 @@
         :root {
             --paper-input-error:{
                 line-height: 32px;
-                font-size: 18px;
+                font-size: 16px;
             };
         }
 
@@ -70,40 +70,43 @@
             debounce-duration="300">
         </iron-ajax>
         <div class="layout horizontal wrap">
-        <paper-input id="uniprotId" name="uniprotId"
-                     label="UniProt ID" value="{{uniprotId}}"
-                     pattern="[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"
-                     required auto-validate
-                     error-message="It is not a valid UniProt identifier!">
-        </paper-input>
-        <paper-dropdown-menu id="enzyme" name="enzyme"
-                     label="Enzyme" value="{{enzyme}}"
-                     error-message="Please select an enzyme!">
-            <paper-listbox class="dropdown-content">
-                <template id="enzymesMenu" is="dom-repeat" items="{{enzymeList}}" attr-for-selected="value">
-                    <paper-item id="enzyme{{index}}" value="{{item}}">{{item}}</paper-item>
-                </template>
-            </paper-listbox>
-        </paper-dropdown-menu>
-        <paper-input id="missedCleavages" name="missedCleavages"
-                     label="Number of missed cleavages" value="{{missedCleavages}}"
-                     pattern="\d+"
-                     required auto-validate
-                     error-message="Only numeric values!">
-        </paper-input>
-        <paper-input id="minPeptideLength" name="minPeptideLength"
-                     label="Minimal peptide length (optional)" value="{{minPeptideLength}}"
-                     pattern="\d+"
-                     auto-validate
-                     error-message="Only numeric values!">
-        </paper-input>
-        <paper-input id="maxPeptideLength" name="maxPeptideLength"
-                     label="Maximal peptide length (optional)" value="{{maxPeptideLength}}"
-                     pattern="\d+"
-                     auto-validate
-                     error-message="Only numeric values!">
-        </paper-input>
-        <div class="buttonPadding"><paper-button raised class="indigo" on-click="digest">digest</paper-button></div>
+            <paper-input id="uniprotId" name="uniprotId"
+                         label="UniProt ID" value="{{uniprotId}}"
+                         pattern="[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"
+                         required auto-validate
+                         error-message="It is not a valid UniProt identifier!">
+            </paper-input>
+            <paper-dropdown-menu id="enzyme" name="enzyme"
+                                 label="Enzyme" value="{{enzyme}}"
+                                 required auto-validate
+                                 error-message="Please select an enzyme!">
+                <paper-listbox class="dropdown-content">
+                    <template id="enzymesMenu" is="dom-repeat" items="{{enzymeList}}" attr-for-selected="value">
+                        <paper-item id="enzyme{{index}}" value="{{item}}">{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-input type="number" id="missedCleavages" name="missedCleavages"
+                         label="Number of missed cleavages" value="{{missedCleavages}}"
+                         pattern="\d+"
+                         required auto-validate
+                         error-message="Only numeric values!">
+            </paper-input>
+            <paper-input id="minPeptideLength" name="minPeptideLength"
+                         label="Minimal peptide length (optional)" value="{{minPeptideLength}}"
+                         pattern="\d+"
+                         auto-validate
+                         error-message="Only numeric values!">
+            </paper-input>
+            <paper-input id="maxPeptideLength" name="maxPeptideLength"
+                         label="Maximal peptide length (optional)" value="{{maxPeptideLength}}"
+                         pattern="\d+"
+                         auto-validate
+                         error-message="Only numeric values!">
+            </paper-input>
+            <div class="buttonPadding">
+                <paper-button id="submitButton" raised class="indigo" on-click="digest">digest</paper-button>
+            </div>
         </div>
     </template>
     <script>
@@ -114,11 +117,11 @@
                     value: /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g
                 },
                 enzymeList: {
-                    type: Array
+                    type: Array,
+                    value: Object.keys(enzymes)
                 },
                 enzyme: {
-                    type: String,
-                    value: "trypsin"
+                    type: String
                 },
                 missedCleavages: {
                     type: Number,
@@ -136,17 +139,16 @@
                     type: String,
                     observer: 'fetchProtein'
                 },
-                proteinSequence: {
-                    type: String,
-                    //observer: 'digest'
+                fastaHeader: {
+                    type: String
                 },
-                enzyme: {
-                    type: String,
-                    value: "trypsin"
+                proteinSequence: {
+                    type: String
+                },
+                peptides: {
+                    type: Array,
+                    value: []
                 }
-            },
-            attached: function(){
-                this.enzymeList = Object.keys(enzymes);
             },
             fetchProtein: function(){
                 if(this.uniprotRegexp.test(this.uniprotId)){
@@ -156,18 +158,23 @@
             handleResponse: function(request) {
                 response = request.detail.response;
                 var fastaArray = response.split('\n');
-                //var fastaHeader = fastaArray[0];
+                this.fastaHeader = fastaArray[0];
                 this.proteinSequence = fastaArray.slice(1,fastaArray._length).toString().replace(/,/g,"");
             },
             digest: function() {
-                var digester = new cleave(
+                if(!this.enzyme){
+                    this.$.enzyme.setAttribute('invalid', true);
+                }
+                if(!enzymes[this.enzyme]){
+                    throw "Not recognized enzyme: "+this.enzyme;
+                }
+                this.peptides = new cleave(
                     this.proteinSequence,
-                    this.enzyme,
+                    enzymes[this.enzyme],
                     this.missedCleavages,
                     this.minPeptideLength,
                     this.maxPeptideLength
                 );
-                console.log(digester);
             }
         });
     </script>
