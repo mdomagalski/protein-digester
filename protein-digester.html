@@ -17,10 +17,29 @@
     <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
     <style is="protein-digester-style">
         :root {
-            --paper-input-error:{
+            --paper-input-container-input: {
+                border-radius: 3px;
+                font-size: 18px;
                 line-height: 32px;
-                font-size: 16px;
+
             };
+
+            --paper-input-container-label: {
+                padding-bottom: 10px;
+                padding-left: 5px;
+                padding-bottom: 10px;
+                font-size: 18px;
+                line-height: 32px;
+            };
+
+            --paper-input-error:{
+                font-size: 18px;
+                margin-top: 5px;
+            };
+
+            --paper-input-container: {
+                margin-bottom: 8px;
+            }
         }
 
         paper-item {
@@ -55,9 +74,21 @@
             margin-top: 15px;
         }
 
+        paper-dropdown-menu {
+            margin: 8px 20px 0 0;
+        }
+
         paper-input {
-            width: 225px;
-            margin: 0 20px;
+            width: 180px;
+            margin: 0 20px 0 0;
+        }
+
+        #digesterForm {
+            padding: 0 50px 0 0;
+        }
+
+        .short {
+            width: 120px;
         }
     </style>
     <template>
@@ -69,12 +100,12 @@
             on-response="handleResponse"
             debounce-duration="300">
         </iron-ajax>
-        <div class="layout horizontal wrap">
+        <div id="digesterForm" class="layout horizontal wrap">
             <paper-input id="uniprotId" name="uniprotId"
                          label="UniProt ID" value="{{uniprotId}}"
                          pattern="[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"
                          required auto-validate
-                         error-message="It is not a valid UniProt identifier!">
+                         error-message="Not a valid UniProt identifier!">
             </paper-input>
             <paper-dropdown-menu id="enzyme" name="enzyme"
                                  label="Enzyme" value="{{enzyme}}"
@@ -86,20 +117,20 @@
                     </template>
                 </paper-listbox>
             </paper-dropdown-menu>
-            <paper-input type="number" id="missedCleavages" name="missedCleavages"
-                         label="Number of missed cleavages" value="{{missedCleavages}}"
+            <paper-input type="number" id="missedCleavages" name="missedCleavages" class="short"
+                         label="Missed cleavages" value="{{missedCleavages}}"
                          pattern="\d+"
                          required auto-validate
                          error-message="Only numeric values!">
             </paper-input>
             <paper-input id="minPeptideLength" name="minPeptideLength"
-                         label="Minimal peptide length (optional)" value="{{minPeptideLength}}"
+                         label="Min. length (optional)" value="{{minPeptideLength}}"
                          pattern="\d+"
                          auto-validate
                          error-message="Only numeric values!">
             </paper-input>
             <paper-input id="maxPeptideLength" name="maxPeptideLength"
-                         label="Maximal peptide length (optional)" value="{{maxPeptideLength}}"
+                         label="Max. length (optional)" value="{{maxPeptideLength}}"
                          pattern="\d+"
                          auto-validate
                          error-message="Only numeric values!">
@@ -147,7 +178,8 @@
                 },
                 peptides: {
                     type: Array,
-                    value: []
+                    value: [],
+                    notify: true
                 }
             },
             fetchProtein: function(){
