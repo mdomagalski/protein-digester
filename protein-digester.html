@@ -185,6 +185,8 @@
                 }
             },
             fetchProtein: function(){
+                this.proteinSequence="";
+                this.fastaHeader="";
                 if(this.uniprotRegexp.test(this.uniprotId)){
                     this.$.ajax.generateRequest();
                 }
@@ -196,9 +198,8 @@
                 this.proteinSequence = fastaArray.slice(1,fastaArray._length).toString().replace(/,/g,"");
             },
             digest: function() {
-                if(!this.enzyme){
-                    this.$.enzyme.setAttribute('invalid', true);
-                }
+                this._checkUniprotId();
+                this._checkEnzyme();
                 if(!enzymes[this.enzyme]){
                     throw "Not recognized enzyme: "+this.enzyme;
                 }
@@ -209,6 +210,20 @@
                     this.minPeptideLength,
                     this.maxPeptideLength
                 );
+            },
+            _checkUniprotId: function(){
+                if(!this.uniprotId){
+                    this.$.uniprotId.setAttribute('invalid', true);
+                }else{
+                    this.$.uniprotId.removeAttribute('invalid');
+                }
+            },
+            _checkEnzyme: function(){
+                if(!this.enzyme){
+                    this.$.enzyme.setAttribute('invalid', true);
+                }else{
+                    this.$.enzyme.removeAttribute('invalid');
+                }
             }
         });
     </script>
