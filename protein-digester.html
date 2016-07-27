@@ -154,7 +154,8 @@
                     value: Object.keys(enzymes)
                 },
                 enzyme: {
-                    type: String
+                    type: String,
+                    observer: '_configureEnzyme'
                 },
                 missedCleavages: {
                     type: Number,
@@ -223,6 +224,17 @@
                     this.$.enzyme.setAttribute('invalid', true);
                 }else{
                     this.$.enzyme.removeAttribute('invalid');
+                }
+            },
+            _configureEnzyme: function(){
+                if(this.enzyme=='pronase'){
+                    this.missedCleavages = 19;
+                    this.minPeptideLength = 1;
+                    this.maxPeptideLength = 20;
+                }else{
+                    this.missedCleavages = 1;
+                    this.minPeptideLength = null;
+                    this.maxPeptideLength = null;
                 }
             }
         });
