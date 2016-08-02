@@ -3,6 +3,7 @@
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
@@ -23,7 +24,6 @@
                 border-radius: 3px;
                 font-size: 18px;
                 line-height: 32px;
-
             };
 
             --paper-input-container-label: {
@@ -109,21 +109,25 @@
                          required auto-validate
                          error-message="Not a valid UniProt identifier!">
             </paper-input>
+            <iron-localstorage name="uniprotIdCache" value="{{uniprotId}}"></iron-localstorage>
             <paper-dropdown-menu id="enzyme" name="enzyme"
                                  label="Enzyme" value="{{enzyme}}"
                                  required auto-validate
                                  error-message="Please select an enzyme!">
-                <paper-listbox class="dropdown-content">
+                <paper-listbox class="dropdown-content" selected="{{enzymeIndex}}">
                     <template id="enzymesMenu" is="dom-repeat" items="{{enzymeList}}" attr-for-selected="value">
                         <paper-item id="enzyme{{index}}" value="{{item}}">{{item}}</paper-item>
                     </template>
                 </paper-listbox>
+                <iron-localstorage name="enzymeCache" value="{{enzymeIndex}}"></iron-localstorage>
             </paper-dropdown-menu>
             <paper-input type="number" id="missedCleavages" name="missedCleavages" class="short"
                          label="Missed cleavages" value="{{missedCleavages}}"
                          pattern="\d+"
                          required auto-validate
                          error-message="Only numeric values!">
+                <iron-localstorage name="missedCleavages" value="{{missedCleavages}}"
+                                   on-iron-localstorage-load-empty="_initializeMissedCleavages"></iron-localstorage>
             </paper-input>
             <paper-input id="minPeptideLength" name="minPeptideLength"
                          label="Min. length (optional)" value="{{minPeptideLength}}"
@@ -158,8 +162,7 @@
                     observer: '_configureEnzyme'
                 },
                 missedCleavages: {
-                    type: Number,
-                    value: 1
+                    type: Number
                 },
                 minPeptideLength: {
                     type: Number,
@@ -228,14 +231,15 @@
             },
             _configureEnzyme: function(){
                 if(this.enzyme=='pronase'){
-                    this.missedCleavages = 19;
-                    this.minPeptideLength = 1;
-                    this.maxPeptideLength = 20;
+                    this.maxPeptideLength = 12;
+                    this.missedCleavages = this.maxPeptideLength-1;
                 }else{
-                    this.missedCleavages = 1;
                     this.minPeptideLength = null;
                     this.maxPeptideLength = null;
                 }
+            },
+            _initializeMissedCleavages: function(){
+                this.set('missedCleavages', 1);
             }
         });
     </script>
