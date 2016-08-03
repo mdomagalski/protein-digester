@@ -14,12 +14,14 @@ function cleave(sequence, enzymeCleavagePatterns, missed_cleavages, min_length, 
     }
 
     var cleavage_sites= [];
-    for (pattern of enzymeCleavagePatterns){
+    for (var idx in enzymeCleavagePatterns){
+        var pattern = enzymeCleavagePatterns[idx];
         var regexpPattern = pattern[0];
         var lookbehindPattern = pattern[1];
         if (lookbehindPattern){
             var match=XRegExp.matchAllLb(sequence, lookbehindPattern, regexpPattern);
-            for (var position of match){
+            for (var idx in match){
+                var position = match[idx];
                 cleavage_sites.push(position);
             }
         }else{
