@@ -57,7 +57,7 @@ function cleave(sequence, enzymeCleavagePatterns, missed_cleavages, min_length, 
             var seq = sequence.substring(peptide_start,peptide_end);
             if ((min_length==null || seq.length >= min_length)
                 &&(max_length==null || seq.length <= max_length)){
-                if(sites_filter) {
+                if(sites_filter.length>0) {
                     for (var j in sites_filter) {
                         var site = sites_filter[j];
                         if (peptide_start < site && site <= peptide_end) {

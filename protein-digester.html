@@ -7,6 +7,7 @@
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <script src="../fishtones-js/dist/fishtones-js-bundle-min.js"></script>
@@ -46,6 +47,8 @@
             --paper-menu-button: {
                 margin-top: 8px;
             };
+
+            --paper-spinner-stroke-width: 3px;
         }
 
         paper-item {
@@ -87,6 +90,13 @@
         paper-input {
             width: 180px;
             margin: 0 20px 0 0;
+        }
+
+
+        paper-spinner {
+            top: 8px;
+            height: 40px;
+            width: 40px;
         }
 
         #digesterForm {
@@ -149,6 +159,7 @@
             <iron-localstorage name="maxPeptideLength" value="{{maxPeptideLength}}"></iron-localstorage>
             <div class="buttonPadding">
                 <paper-button id="submitButton" raised class="indigo" on-click="digest"><iron-icon icon="content-cut"></iron-icon>&nbsp;digest</paper-button>
+                <paper-spinner id="spinner"></paper-spinner>
             </div>
         </div>
     </template>
@@ -195,7 +206,8 @@
                     notify: true
                 },
                 sites: {
-                    type: Array
+                    type: Array,
+                    observer: '_filterSites'
                 }
             },
             fetchProtein: function(){
@@ -212,17 +224,21 @@
                 this.proteinSequence = fastaArray.slice(1,fastaArray._length).toString().replace(/,/g,"");
             },
             digest: function() {
-                this._checkUniprotId();
-                this._checkEnzyme();
-                this._checkPeptideLength();
-                this.peptides = new cleave(
-                    this.proteinSequence,
-                    enzymes[this.enzyme],
-                    this.missedCleavages,
-                    this.minPeptideLength,
-                    this.maxPeptideLength,
-                    this.sites
-                );
+                this.$.spinner.active=true;
+                this.async(function() {
+                    this._checkUniprotId();
+                    this._checkEnzyme();
+                    this._checkPeptideLength();
+                    this.peptides = new cleave(
+                        this.proteinSequence,
+                        enzymes[this.enzyme],
+                        this.missedCleavages,
+                        this.minPeptideLength,
+                        this.maxPeptideLength,
+                        this.sites
+                    );
+                    this.$.spinner.active=false
+                },10);;
             },
             _checkUniprotId: function(){
                 if(!this.uniprotId){
@@ -253,6 +269,9 @@
                 }else{
                     this.$.minPeptideLength.removeAttribute('invalid');
                 }
+            },
+            _filterSites: function() {
+                if(this.proteinSequence){this.digest();}
             },
             _initializeMissedCleavages: function(){
                 this.set('missedCleavages', 1);
