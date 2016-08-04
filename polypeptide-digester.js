@@ -1,4 +1,4 @@
-function cleave(sequence, enzymeCleavagePatterns, missed_cleavages, min_length, max_length) {
+function cleave(sequence, enzymeCleavagePatterns, missed_cleavages, min_length, max_length, sites_filter) {
     // enzymeCleavagePatterns = [[cleavage site regex, (look-behind pattern or false)]]
     // javascript regular expression engine doesn't support 'look-behind'
     // patterns, which are necessary to match overlapping cleavage sites.
@@ -12,6 +12,9 @@ function cleave(sequence, enzymeCleavagePatterns, missed_cleavages, min_length, 
     function sortNumber(a,b) {
         return a - b;
     }
+
+    min_length = parseInt(min_length)||null;
+    max_length = parseInt(max_length)||null;
 
     var cleavage_sites= [];
     for (var idx in enzymeCleavagePatterns){
@@ -49,9 +52,22 @@ function cleave(sequence, enzymeCleavagePatterns, missed_cleavages, min_length, 
             cleavage += 1;
         }
         for (var idx in range.slice(0,cleavage-1)){
-            var seq = sequence.substring(cleavage_sites_iterator[cleavage_sites_iterator.length-cleavage+Number(idx)],cleavage_sites[i]);
-            if ((min_length==null || seq.length >= min_length)&&(max_length==null ||seq.length <= max_length)){
-                peptides.push(seq);
+            var peptide_start = cleavage_sites_iterator[cleavage_sites_iterator.length-cleavage+Number(idx)];
+            var peptide_end = cleavage_sites[i];
+            var seq = sequence.substring(peptide_start,peptide_end);
+            if ((min_length==null || seq.length >= min_length)
+                &&(max_length==null || seq.length <= max_length)){
+                if(sites_filter) {
+                    for (var j in sites_filter) {
+                        var site = sites_filter[j];
+                        if (peptide_start < site && site <= peptide_end) {
+                            peptides.push(seq);
+                            break;
+                        }
+                    }
+                }else{
+                    peptides.push(seq);
+                }
             }
         }
     }
