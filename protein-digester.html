@@ -198,7 +198,8 @@
                     type: String
                 },
                 proteinSequence: {
-                    type: String
+                    type: String,
+                    notify: true
                 },
                 peptides: {
                     type: Array,
@@ -212,6 +213,8 @@
             },
             fetchProtein: function(){
                 this.proteinSequence="";
+                this.peptides = [];
+                this.sites = [];
                 this.fastaHeader="";
                 if(this.uniprotRegexp.test(this.uniprotId)){
                     this.$.ajax.generateRequest();
