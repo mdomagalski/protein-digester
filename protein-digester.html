@@ -137,7 +137,7 @@
             </paper-dropdown-menu>
             <paper-input type="number" id="missedCleavages" name="missedCleavages" class="short"
                          label="Missed cleavages" value="{{missedCleavages}}"
-                         pattern="\d+"
+                         min="0"
                          required auto-validate
                          error-message="Only numeric values!">
                 <iron-localstorage name="missedCleavages" value="{{missedCleavages}}"
